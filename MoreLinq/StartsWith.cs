@@ -42,6 +42,7 @@ namespace MoreLinq
         /// <see cref="EqualityComparer{T}.Default"/> on pairs of elements at
         /// the same index.
         /// </remarks>
+
         public static bool StartsWith<T>(this IEnumerable<T> first, IEnumerable<T> second)
         {
             return StartsWith(first, second, null);
@@ -66,10 +67,18 @@ namespace MoreLinq
         /// it calls <see cref="IEqualityComparer{T}.Equals(T,T)" /> on pairs
         /// of elements at the same index.
         /// </remarks>
+
         public static bool StartsWith<T>(this IEnumerable<T> first, IEnumerable<T> second, IEqualityComparer<T> comparer)
         {
             if (first == null) throw new ArgumentNullException(nameof(first));
             if (second == null) throw new ArgumentNullException(nameof(second));
+
+            if (first.TryGetCollectionCount() is int firstCount &&
+                second.TryGetCollectionCount() is int secondCount &&
+                secondCount > firstCount)
+            {
+                return false;
+            }
 
             comparer = comparer ?? EqualityComparer<T>.Default;
 

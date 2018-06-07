@@ -12,6 +12,34 @@ Documentation for the stable and beta releases can be found at
 [morelinq.github.io](http://morelinq.github.io/).
 
 
+## Building
+
+To build MoreLINQ from sources, you will need:
+
+- [.NET Core 2.0 with SDK 2.1][dotnet-2.0-sdk-2.1]
+- [Mono][mono] 5.0 if building on other platforms than Windows
+
+Then run either `build.cmd` if building on Windows or `build.sh` if
+building on macOS or a Linux distribution supported by .NET Core.
+
+Some code in the project is generated using [T4][t4] templates. To regenerate
+the code from modified templates, run `MoreLinq\tt.cmd` (Windows) or
+`MoreLinq/tt.sh` depending on your platform.
+
+Building the documentation is supported on Windows only and requires
+[Sandcastle Help File Builder (SHFB)][shfb]. Executing `builddocs.cmd`
+generates the documentation in the `docs/api` directory. It can be browsed
+locally using any HTTP server of static files, like
+[http-server][http-server].
+
+
+[mono]: https://www.mono-project.com/
+[dotnet-2.0-sdk-2.1]: https://github.com/dotnet/core/blob/master/release-notes/download-archives/2.1.2-sdk-download.md
+[shfb]: https://github.com/EWSoftware/SHFB/releases/tag/v2017.12.30.2
+[http-server]: https://www.npmjs.com/package/http-server
+[t4]: https://docs.microsoft.com/en-us/visualstudio/modeling/code-generation-and-t4-text-templates
+
+
 ## Operators
 
 ### Acquire
@@ -50,6 +78,13 @@ than or equal to the given integer.
 Determines whether or not the number of elements in the sequence is lesser
 than or equal to the given integer.
 
+### Backsert
+
+Inserts the elements of a sequence into another sequence at a
+specified index from the tail of the sequence, where zero always represents
+the last position, one represents the second-last element, two represents
+the third-last element and so on.
+
 ### Batch
 
 Batches the source sequence into sized buckets.
@@ -59,8 +94,15 @@ This method has 2 overloads.
 ### Cartesian
 
 Returns the Cartesian product of two sequences by combining each element of
-the first set with each in the second and applying the user=define projection
-to the pair
+the first set with each in the second and applying a user-defined projection
+to the pair.
+
+### Choose
+
+Applies a function to each element of the source sequence and returns a new
+sequence of result elements for source elements where the function returns a
+couple (2-tuple) having a `true` as its first element and result as the
+second.
 
 ### CompareCount
 
@@ -70,8 +112,6 @@ first sequence has fewer, the same or more elements than the second sequence.
 ### Concat
 
 Returns a sequence consisting of the head element and the given tail elements.
-
-This method has 2 overloads.
 
 ### Consume
 
@@ -90,6 +130,12 @@ sequence of unique keys and their number of occurrences in the original
 sequence.
 
 This method has 2 overloads.
+
+### CountDown
+
+Provides a countdown counter for a given count of elements at the tail of the
+sequence where zero always represents the last element, one represents the
+second-last element, two represents the third-last element and so on.
 
 ### DistinctBy
 
@@ -245,15 +291,15 @@ This method has 4 overloads.
 
 ### MaxBy
 
-Returns the maximal element of the given sequence, based on the given
-projection.
+Returns the maxima (maximal elements) of the given sequence, based on the
+given projection.
 
 This method has 2 overloads.
 
 ### MinBy
 
-Returns the minimal element of the given sequence, based on the given
-projection.
+Returns the minima (minimal elements) of the given sequence, based on the
+given projection.
 
 This method has 2 overloads.
 
@@ -261,11 +307,6 @@ This method has 2 overloads.
 
 Returns a sequence with a range of elements in the source sequence
 moved to a new offset.
-
-### NestedLoops
-
-Produces a sequence from an action based on the dynamic generation of N nested
-loops who iteration counts are defined by
 
 ### OrderBy
 
@@ -414,14 +455,11 @@ Generates a sequence of integral numbers within the (inclusive) specified range.
 
 This method has 2 overloads.
 
-### ~~SingleOrFallback~~
+### Shuffle
 
-Consider using `FallbackIfEmpty` instead. `SingleOrFallback` may be removed in
-a future version. For more information, see issue [#122][#122].
+Returns a sequence of elements in random order from the original sequence.
 
-Returns the single element in the given sequence, or the result of executing a
-fallback delegate if the sequence is empty. This method throws an exception if
-there is more than one element in the sequence
+This method has 2 overloads.
 
 ### SkipLast
 
@@ -532,6 +570,10 @@ or tuples of 2.
 
 This method has 4 overloads.
 
+### Transpose
+
+Transposes the rows of a sequence into columns.
+
 ### TraverseBreadthFirst
 
 Traverses a tree in a breadth-first fashion, starting at a root node and using
@@ -561,10 +603,20 @@ This method has 2 overloads.
 Processes a sequence into a series of subsequences representing a windowed
 subset of the original
 
+### WindowLeft
+
+Creates a left-aligned sliding window over the source sequence of a given size.
+
+### WindowRight
+
+Creates a right-aligned sliding window over the source sequence of a given size.
+
 ### ZipLongest
 
 Returns a projection of tuples, where each tuple contains the N-th element
 from each of the argument sequences
+
+This method has 3 overloads.
 
 ### ZipShortest
 
@@ -572,6 +624,36 @@ Returns a projection of tuples, where each tuple contains the N-th element
 from each of the argument sequences.
 
 This method has 3 overloads.
+
+
+## Experimental Operators
+
+THESE METHODS ARE EXPERIMENTAL. THEY MAY BE UNSTABLE AND UNTESTED. THEY MAY BE
+REMOVED FROM A FUTURE MAJOR OR MINOR RELEASE AND POSSIBLY WITHOUT NOTICE. USE
+THEM AT YOUR OWN RISK. THE METHODS ARE PUBLISHED FOR FIELD EXPERIMENTATION TO
+SOLICIT FEEDBACK ON THEIR UTILITY AND DESIGN/IMPLEMENTATION DEFECTS.
+
+Use of experimental methods requires importing the `MoreLinq.Experimental`
+namespace.
+
+### Await
+
+Creates a sequence query that streams the result of each task in the source
+sequence as it completes asynchronously.
+
+This method has 2 overloads.
+
+### AwaitCompletion
+
+Awaits completion of all asynchronous evaluations irrespective of whether they
+succeed or fail. An additional argument specifies a function that projects the
+final result given the source item and completed task.
+
+### Memoize
+
+Creates a sequence that lazily caches the source as it is iterated for the
+first time, reusing the cache thereafter for future re-iterations. If the
+source is already cached or buffered then it is returned verbatim.
 
 
 [#122]: https://github.com/morelinq/MoreLINQ/issues/122

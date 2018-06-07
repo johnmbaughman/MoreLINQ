@@ -36,9 +36,9 @@ namespace MoreLinq
         /// </param>
         /// <returns>The scanned sequence.</returns>
         /// <example>
-        /// <code>
+        /// <code><![CDATA[
         /// var result = Enumerable.Range(1, 5).Select(i => i.ToString()).ScanRight((a, b) => string.Format("({0}/{1})", a, b));
-        /// </code>
+        /// ]]></code>
         /// The <c>result</c> variable will contain <c>[ "(1+(2+(3+(4+5))))", "(2+(3+(4+5)))", "(3+(4+5))", "(4+5)", "5" ]</c>.
         /// </example>
         /// <remarks>
@@ -53,7 +53,7 @@ namespace MoreLinq
 
             return ScanRightImpl(source, func,
                                  list => list.Count > 0
-                                       ? (list.Last(), list.Count - 1)
+                                       ? (list[list.Count - 1], list.Count - 1)
                                        : ((TSource, int)?) null);
         }
 
@@ -70,9 +70,9 @@ namespace MoreLinq
         /// <param name="func">A right-associative accumulator function to be invoked on each element.</param>
         /// <returns>The scanned sequence.</returns>
         /// <example>
-        /// <code>
+        /// <code><![CDATA[
         /// var result = Enumerable.Range(1, 4).ScanRight("5", (a, b) => string.Format("({0}/{1})", a, b));
-        /// </code>
+        /// ]]></code>
         /// The <c>result</c> variable will contain <c>[ "(1+(2+(3+(4+5))))", "(2+(3+(4+5)))", "(3+(4+5))", "(4+5)", "5" ]</c>.
         /// </example>
         /// <remarks>
@@ -88,9 +88,9 @@ namespace MoreLinq
             return ScanRightImpl(source, func, list => (seed, list.Count));
         }
 
-        static IEnumerable<TResult> ScanRightImpl<TSource, TResult>(IEnumerable<TSource> source, Func<TSource, TResult, TResult> func, Func<IList<TSource>, (TResult Seed, int Count)?> seeder)
+        static IEnumerable<TResult> ScanRightImpl<TSource, TResult>(IEnumerable<TSource> source, Func<TSource, TResult, TResult> func, Func<IListLike<TSource>, (TResult Seed, int Count)?> seeder)
         {
-            var list = (source as IList<TSource>) ?? source.ToList();
+            var list = source.ToListLike();
 
             var r = seeder(list);
             if (!r.HasValue)

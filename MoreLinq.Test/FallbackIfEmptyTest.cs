@@ -17,7 +17,6 @@
 
 namespace MoreLinq.Test
 {
-    using System.Collections.Generic;
     using NUnit.Framework;
 
     [TestFixture]
@@ -37,13 +36,11 @@ namespace MoreLinq.Test
             // ReSharper restore PossibleMultipleEnumeration
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void FallbackIfEmptyPreservesSourceCollectionIfPossible(bool readOnly)
+        [TestCase(SourceKind.BreakingCollection)]
+        [TestCase(SourceKind.BreakingReadOnlyCollection)]
+        public void FallbackIfEmptyPreservesSourceCollectionIfPossible(SourceKind sourceKind)
         {
-            var source = readOnly
-                       ? new UnenumerableReadOnlyList<int>(new[] { 1 })
-                       : (IEnumerable<int>)new UnenumerableList<int> { 1 };
+            var source = new[] { 1 }.ToSourceKind(sourceKind);
             // ReSharper disable PossibleMultipleEnumeration
             Assert.AreSame(source.FallbackIfEmpty(12), source);
             Assert.AreSame(source.FallbackIfEmpty(12, 23), source);
@@ -54,13 +51,11 @@ namespace MoreLinq.Test
             // ReSharper restore PossibleMultipleEnumeration
         }
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public void FallbackIfEmptyPreservesFallbackCollectionIfPossible(bool readOnly)
+        [TestCase(SourceKind.BreakingCollection)]
+        [TestCase(SourceKind.BreakingReadOnlyCollection)]
+        public void FallbackIfEmptyPreservesFallbackCollectionIfPossible(SourceKind sourceKind)
         {
-            var source = readOnly
-                       ? new UnenumerableReadOnlyList<int>(new int[0])
-                       : (IEnumerable<int>)new UnenumerableList<int>();
+            var source = new int[0].ToSourceKind(sourceKind);
             var fallback = new[] { 1 };
             Assert.AreSame(source.FallbackIfEmpty(fallback), fallback);
             Assert.AreSame(source.FallbackIfEmpty(fallback.AsEnumerable()), fallback);

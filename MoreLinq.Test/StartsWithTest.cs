@@ -91,5 +91,15 @@ namespace MoreLinq.Test
             Assert.False(first.StartsWith(second, EqualityComparer.Create<int>(delegate { return false; })));
             Assert.True(first.StartsWith(second, EqualityComparer.Create<int>(delegate { return true; })));
         }
+
+        [TestCase(SourceKind.BreakingCollection)]
+        [TestCase(SourceKind.BreakingReadOnlyCollection)]
+        public void StartsWithUsesCollectionsCountToAvoidUnnecessaryIteration(SourceKind sourceKind)
+        {
+            var first = new[] { 1, 2 }.ToSourceKind(sourceKind);
+            var second = new[] { 1, 2, 3 }.ToSourceKind(sourceKind);
+
+            Assert.False(first.StartsWith(second));
+        }
     }
 }

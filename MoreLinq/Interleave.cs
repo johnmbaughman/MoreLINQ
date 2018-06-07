@@ -30,9 +30,9 @@ namespace MoreLinq
         /// <remarks>
         /// Interleave combines sequences by visiting each in turn, and returning the first element of each, followed
         /// by the second, then the third, and so on. So, for example:<br/>
-        /// <code>
+        /// <code><![CDATA[
         /// {1,1,1}.Interleave( {2,2,2}, {3,3,3} ) => { 1,2,3,1,2,3,1,2,3 }
-        /// </code>
+        /// ]]></code>
         /// This operator behaves in a deferred and streaming manner.<br/>
         /// When sequences are of unequal length, this method will skip those sequences that have been fully consumed
         /// and continue interleaving the remaining sequences.<br/>
@@ -55,9 +55,9 @@ namespace MoreLinq
         /// <remarks>
         /// Interleave combines sequences by visiting each in turn, and returning the first element of each, followed
         /// by the second, then the third, and so on. So, for example:<br/>
-        /// <code>
+        /// <code><![CDATA[
         /// {1,1,1}.Interleave( {2,2,2}, {3,3,3} ) => { 1,2,3,1,2,3,1,2,3 }
-        /// </code>
+        /// ]]></code>
         /// This operator behaves in a deferred and streaming manner.<br/>
         /// When sequences are of unequal length, this method will use the imbalance strategy specified to
         /// decide how to continue interleaving the remaining sequences. See <see cref="ImbalancedInterleaveStrategy"/>
@@ -70,6 +70,7 @@ namespace MoreLinq
         /// <param name="imbalanceStrategy">Defines the behavior of the operator when sequences are of unequal length</param>
         /// <param name="otherSequences">The other sequences in the interleave group</param>
         /// <returns>A sequence of interleaved elements from all of the source sequences</returns>
+
         static IEnumerable<T> Interleave<T>(this IEnumerable<T> sequence, ImbalancedInterleaveStrategy imbalanceStrategy, params IEnumerable<T>[] otherSequences)
         {
             if (sequence == null) throw new ArgumentNullException(nameof(sequence));

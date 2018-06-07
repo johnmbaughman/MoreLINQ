@@ -45,7 +45,7 @@ namespace MoreLinq.Test
         {
             AssertTakeLast(new[] { 12, 34, 56 },
                            -2,
-                           result => Assert.IsFalse(result.GetEnumerator().MoveNext()));
+                           result => Assert.That(result, Is.Empty));
         }
 
         [Test]
@@ -63,13 +63,11 @@ namespace MoreLinq.Test
             }
         }
 
-        [TestCase(true)]
-        [TestCase(false)]
-        public void TakeLastOptimizedForCollections(bool readOnly)
+        [TestCase(SourceKind.BreakingList)]
+        [TestCase(SourceKind.BreakingReadOnlyList)]
+        public void TakeLastOptimizedForCollections(SourceKind sourceKind)
         {
-            var sequence = readOnly
-                         ? new UnenumerableReadOnlyList<int>(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 })
-                         : (IEnumerable<int>)new UnenumerableList<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            var sequence = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }.ToSourceKind(sourceKind);
 
             sequence.TakeLast(3).AssertSequenceEqual(8, 9, 10);
         }

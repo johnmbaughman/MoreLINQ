@@ -41,14 +41,14 @@ namespace MoreLinq
         /// This operator uses deferred execution and streams its results.
         /// </remarks>
         /// <example>
-        /// <code>
+        /// <code><![CDATA[
         /// var numbers = new[] { 123, 456, 789 };
         /// var result = numbers.TagFirstLast((num, fst, lst) => new
         ///              {
         ///                  Number = num,
         ///                  IsFirst = fst, IsLast = lst
         ///              });
-        /// </code>
+        /// ]]></code>
         /// The <c>result</c> variable, when iterated over, will yield
         /// <c>{ Number = 123, IsFirst = True, IsLast = False }</c>,
         /// <c>{ Number = 456, IsFirst = False, IsLast = False }</c> and
@@ -60,15 +60,8 @@ namespace MoreLinq
             if (source == null) throw new ArgumentNullException(nameof(source));
             if (resultSelector == null) throw new ArgumentNullException(nameof(resultSelector));
 
-            return _(); IEnumerable<TResult> _()
-            {
-                var edge = new[] { new KeyValuePair<bool, TSource>(false, default) };
-                return edge.Concat(source.Select(e => new KeyValuePair<bool, TSource>(true, e)))
-                           .Concat(edge)
-                           .Pairwise((a, b) => new { Prev = a, Curr = b })
-                           .Pairwise((a, b) => new { a.Prev, a.Curr, Next = b.Curr })
-                           .Select(e => resultSelector(e.Curr.Value, !e.Prev.Key, !e.Next.Key));
-            }
+            return source.Index() // count-up
+                         .CountDown(1, (e, cd) => resultSelector(e.Value, e.Key == 0, cd == 0));
         }
     }
 }

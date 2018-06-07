@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="..\bld\DotNetSdkMono.props" />
+
   <PropertyGroup>
     <AssemblyTitle>MoreLinq.Test</AssemblyTitle>
     <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net451</TargetFrameworks>
@@ -19,11 +21,16 @@
     <WarningsNotAsErrors>618</WarningsNotAsErrors>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <DefineConstants>$(DefineConstants);NO_ASYNC</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MoreLinq\MoreLinq.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Delegating" Version="1.1.0" />
     <PackageReference Include="NUnit" Version="3.6.1" />
     <PackageReference Include="NUnitLite" Version="3.6.1" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
@@ -33,10 +40,15 @@
 
   <ItemGroup>
       <Compile Include="*Test.cs" />
+      <Compile Include="Test*.cs" />
       <None Remove="TestResult.xml" />
       <Compile Include="AssertThrowsArgument.cs" />
       <Compile Include="BreakingCollection.cs" />
+      <Compile Include="BreakingAction.cs" />
       <Compile Include="BreakingFunc.cs" />
+      <Compile Include="BreakingList.cs" />
+      <Compile Include="BreakingReadOnlyCollection.cs" />
+      <Compile Include="BreakingReadOnlyList.cs" />
       <Compile Include="BreakingSequence.cs" />
       <Compile Include="Combinatorics.cs" />
       <Compile Include="Comparer.cs" />
@@ -48,11 +60,7 @@
       <Compile Include="SampleData.cs" />
       <Compile Include="Scope.cs" />
       <Compile Include="SequenceReader.cs" />
-      <Compile Include="TestingSequence.cs" />
-      <Compile Include="TestExtensions.cs" />
-      <Compile Include="UnenumerableList.cs" />
-      <Compile Include="UnenumerableReadOnlyList.cs" />
-      <Compile Include="VerifiableEnumerator.cs" />
+      <Compile Include="WatchableEnumerator.cs" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
@@ -78,6 +86,10 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 
 </Project>

@@ -35,12 +35,13 @@ namespace MoreLinq
         /// <returns><c>true</c> if the number of elements in the sequence is greater than
         /// or equal to the given integer or <c>false</c> otherwise.</returns>
         /// <example>
-        /// <code>
-        /// var numbers = { 123, 456, 789 };
+        /// <code><![CDATA[
+        /// var numbers = new[] { 123, 456, 789 };
         /// var result = numbers.AtLeast(2);
-        /// </code>
+        /// ]]></code>
         /// The <c>result</c> variable will contain <c>true</c>.
         /// </example>
+
         public static bool AtLeast<T>(this IEnumerable<T> source, int count)
         {
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
@@ -61,12 +62,13 @@ namespace MoreLinq
         /// <returns><c>true</c> if the number of elements in the sequence is lesser than
         /// or equal to the given integer or <c>false</c> otherwise.</returns>
         /// <example>
-        /// <code>
-        /// var numbers = { 123, 456, 789 };
+        /// <code><![CDATA[
+        /// var numbers = new[] { 123, 456, 789 };
         /// var result = numbers.AtMost(2);
-        /// </code>
+        /// ]]></code>
         /// The <c>result</c> variable will contain <c>false</c>.
         /// </example>
+
         public static bool AtMost<T>(this IEnumerable<T> source, int count)
         {
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
@@ -86,12 +88,13 @@ namespace MoreLinq
         /// <returns><c>true</c> if the number of elements in the sequence is equals
         /// to the given integer or <c>false</c> otherwise.</returns>
         /// <example>
-        /// <code>
-        /// var numbers = { 123, 456, 789 };
+        /// <code><![CDATA[
+        /// var numbers = new[] { 123, 456, 789 };
         /// var result = numbers.Exactly(3);
-        /// </code>
+        /// ]]></code>
         /// The <c>result</c> variable will contain <c>true</c>.
         /// </example>
+
         public static bool Exactly<T>(this IEnumerable<T> source, int count)
         {
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
@@ -114,12 +117,13 @@ namespace MoreLinq
         /// <returns><c>true</c> if the number of elements in the sequence is between (inclusive)
         /// the min and max given integers or <c>false</c> otherwise.</returns>
         /// <example>
-        /// <code>
-        /// var numbers = { 123, 456, 789 };
+        /// <code><![CDATA[
+        /// var numbers = new[] { 123, 456, 789 };
         /// var result = numbers.CountBetween(1, 2);
-        /// </code>
+        /// ]]></code>
         /// The <c>result</c> variable will contain <c>false</c>.
         /// </example>
+
         public static bool CountBetween<T>(this IEnumerable<T> source, int min, int max)
         {
             if (min < 0) throw new ArgumentOutOfRangeException(nameof(min), "Minimum count cannot be negative.");
@@ -132,23 +136,7 @@ namespace MoreLinq
         {
             if (source == null) throw new ArgumentNullException(nameof(source));
 
-            var count = 0;
-
-            if (source is ICollection<T> col)
-            {
-                count = col.Count;
-            }
-            else
-            {
-                using (var e = source.GetEnumerator())
-                {
-                    while (e.MoveNext())
-                    {
-                        if (++count == limit)
-                            break;
-                    }
-                }
-            }
+            var count = source.TryGetCollectionCount() ?? source.CountUpTo(limit);
 
             return count >= min && count <= max;
         }
@@ -166,29 +154,29 @@ namespace MoreLinq
         /// <returns><c>-1</c> if the first sequence has the fewest elements, <c>0</c> if the two sequences have the same number of elements
         /// or <c>1</c> if the first sequence has the most elements.</returns>
         /// <example>
-        /// <code>
-        /// var first = { 123, 456 };
-        /// var second = { 789 };
+        /// <code><![CDATA[
+        /// var first = new[] { 123, 456 };
+        /// var second = new[] { 789 };
         /// var result = first.CompareCount(second);
-        /// </code>
+        /// ]]></code>
         /// The <c>result</c> variable will contain <c>1</c>.
         /// </example>
+
         public static int CompareCount<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second)
         {
             if (first == null) throw new ArgumentNullException(nameof(first));
             if (second == null) throw new ArgumentNullException(nameof(second));
 
-            if (first is ICollection<TFirst> firstCol)
+            if (first.TryGetCollectionCount() is int firstCount)
             {
-                return firstCol.Count.CompareTo(second is ICollection<TSecond> secondCol
-                                                ? secondCol.Count
-                                                : PartialCount(second, firstCol.Count + 1));
+                return firstCount.CompareTo(second.TryGetCollectionCount() ?? second.CountUpTo(firstCount + 1));
+            }
+            else if (second.TryGetCollectionCount() is int secondCount)
+            {
+                return first.CountUpTo(secondCount + 1).CompareTo(secondCount);
             }
             else
             {
-                if (second is ICollection<TSecond> secondCol)
-                    return PartialCount(first, secondCol.Count + 1).CompareTo(secondCol.Count);
-
                 bool firstHasNext;
                 bool secondHasNext;
 
@@ -203,23 +191,7 @@ namespace MoreLinq
                     while (firstHasNext && secondHasNext);
                 }
 
-                return Convert.ToInt32(firstHasNext).CompareTo(Convert.ToInt32(secondHasNext));
-            }
-
-            int PartialCount<T>(IEnumerable<T> source, int limit)
-            {
-                var count = 0;
-
-                using (var e = source.GetEnumerator())
-                {
-                    while (e.MoveNext())
-                    {
-                        if (++count == limit)
-                            break;
-                    }
-                }
-
-                return count;
+                return firstHasNext.CompareTo(secondHasNext);
             }
         }
     }
