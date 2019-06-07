@@ -7,7 +7,7 @@ solution: MoreLinq.sln
 mono: 5.0.1
 dist: trusty
 sudo: required
-dotnet: 2.1.200
+dotnet: 2.1.500
 env:
   - CONFIGURATION=Debug
   - CONFIGURATION=Release
@@ -21,6 +21,7 @@ addons:
     - dotnet-sharedframework-microsoft.netcore.app-1.0.5
 
 before_install:
+  - dotnet --info
   - msbuild /version
   - |
     if [ "$TRAVIS_OS_NAME" == "osx" ] || [ `uname` == "Darwin" ]; then
@@ -50,4 +51,5 @@ script:
   - ./build.sh /v:m /p:Configuration=$CONFIGURATION
   - dotnet exec MoreLinq.Test/bin/$CONFIGURATION/netcoreapp1.0/MoreLinq.Test.dll
   - dotnet exec MoreLinq.Test/bin/$CONFIGURATION/netcoreapp2.0/MoreLinq.Test.dll
+  - dotnet exec MoreLinq.Test/bin/$CONFIGURATION/netcoreapp2.1/MoreLinq.Test.dll
   - mono MoreLinq.Test/bin/$CONFIGURATION/net451/MoreLinq.Test.exe
